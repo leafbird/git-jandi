@@ -1,6 +1,6 @@
 {
   "name": "git-jandi",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Display GitHub contribution graphs in your terminal 🌱",
   "main": "dist/index.js",
   "bin": {
