@@ -2,7 +2,7 @@
 
 import { fetchContributions } from "./fetch.js";
 import { calculateStreak } from "./streak.js";
-import { getTheme } from "./colors.js";
+import { THEME } from "./colors.js";
 import { renderGraph } from "./render.js";
 
 const VERSION = "0.0.1";
@@ -10,7 +10,6 @@ const VERSION = "0.0.1";
 interface Options {
   username: string;
   hideStreak: boolean;
-  theme: string;
 }
 
 function printHelp(): void {
@@ -22,13 +21,11 @@ Usage:
 
 Options:
   --no-streak, -s    Hide streak information
-  --light            Use light theme colors
   --help, -h         Show this help
   --version, -v      Show version
 
 Examples:
   git-jandi leafbird
-  git-jandi torvalds --light
   npx git-jandi octocat
 `.trim());
 }
@@ -56,7 +53,6 @@ function parseArgs(argv: string[]): Options | null {
   return {
     username,
     hideStreak: args.includes("--no-streak") || args.includes("-s"),
-    theme: args.includes("--light") ? "light" : "dark",
   };
 }
 
@@ -67,8 +63,7 @@ async function main(): Promise<void> {
   try {
     const data = await fetchContributions(opts.username);
     const streak = calculateStreak(data.weeks);
-    const theme = getTheme(opts.theme);
-    const output = renderGraph(data, streak, theme, opts.hideStreak);
+    const output = renderGraph(data, streak, THEME, opts.hideStreak);
     console.log(output);
   } catch (err) {
     console.error(err instanceof Error ? err.message : String(err));
