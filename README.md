@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/git-jandi.webp" alt="git-jandi" width="800" />
+  <img src="https://raw.githubusercontent.com/leafbird/git-jandi/main/docs/git-jandi.webp" alt="git-jandi" width="800" />
 </p>
 
 # git-jandi 🌱
