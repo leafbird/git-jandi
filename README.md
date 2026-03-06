@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/git-jandi.webp" alt="git-jandi" width="800" />
+</p>
+
 # git-jandi 🌱
 
 [![npm version](https://img.shields.io/npm/v/git-jandi)](https://www.npmjs.com/package/git-jandi)
