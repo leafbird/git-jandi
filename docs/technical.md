@@ -1,9 +1,3 @@
-# git-jandi — technical.md (draft)
-
-> repo 루트에 배치할 기술 설계 문서. 프로젝트 생성 시 이 내용을 `~/dev/git-jandi/technical.md`로 복사.
-
----
-
 # Technical Design
 
 ## 데이터 흐름
@@ -115,25 +109,25 @@ export function calculateStreak(weeks: WeekData[]): StreakInfo
 ### colors.ts
 
 ```typescript
-export const THEMES: Record<string, Theme> = { dark: ..., light: ... }
-export function getDefaultTheme(): Theme
+export const THEMES: Record<string, Theme> = { light: ..., dark: ... }
+export function getTheme(name: string): Theme
 ```
 
 **역할:** contribution level → 터미널 색상 매핑
 
 **테마:**
 ```typescript
-const dark: Theme = {
-  colors: ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353']
-};
-
 const light: Theme = {
   colors: ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39']
 };
+
+const dark: Theme = {
+  colors: ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353']
+};
 ```
 
-**기본 테마 선택:** `dark` 고정 (대부분의 터미널이 다크 배경)
-- `--light` 옵션으로 전환
+**기본 테마 선택:** `light` 고정
+- `--dark` 옵션으로 전환
 
 ### render.ts
 
@@ -181,7 +175,7 @@ function hexToAnsi(hex: string): string {
 **인자 파싱:** 직접 구현 (외부 라이브러리 없음) — 인자가 단순하므로
 - `argv[2]` → username (필수)
 - `--no-streak` / `-s` → streak 숨기기
-- `--light` → 라이트 테마
+- `--dark` → 다크 테마
 - `--help` / `-h` → 도움말
 - `--version` / `-v` → 버전
 

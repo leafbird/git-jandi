@@ -22,13 +22,13 @@ Usage:
 
 Options:
   --no-streak, -s    Hide streak information
-  --light            Use light theme colors
+  --dark             Use dark theme colors
   --help, -h         Show this help
   --version, -v      Show version
 
 Examples:
   git-jandi leafbird
-  git-jandi torvalds --light
+  git-jandi torvalds --dark
   npx git-jandi octocat
 `.trim());
 }
@@ -56,7 +56,7 @@ function parseArgs(argv: string[]): Options | null {
   return {
     username,
     hideStreak: args.includes("--no-streak") || args.includes("-s"),
-    theme: args.includes("--light") ? "light" : "dark",
+    theme: args.includes("--dark") ? "dark" : "light",
   };
 }
 
