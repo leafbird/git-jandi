@@ -1,0 +1,43 @@
+{
+  "name": "git-jandi",
+  "version": "0.1.0",
+  "description": "Display GitHub contribution graphs in your terminal 🌱",
+  "main": "dist/index.js",
+  "bin": {
+    "git-jandi": "dist/index.js"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "github",
+    "contributions",
+    "grass",
+    "jandi",
+    "cli",
+    "terminal"
+  ],
+  "author": "leafbird",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/leafbird/git-jandi.git"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.5",
+    "@vitest/coverage-v8": "^3.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^3.0.0"
+  }
+}
