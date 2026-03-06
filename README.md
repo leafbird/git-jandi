@@ -1,5 +1,10 @@
 # git-jandi 🌱
 
+[![npm version](https://img.shields.io/npm/v/git-jandi)](https://www.npmjs.com/package/git-jandi)
+[![CI](https://github.com/leafbird/git-jandi/actions/workflows/ci.yml/badge.svg)](https://github.com/leafbird/git-jandi/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/node/v/git-jandi)](https://nodejs.org)
+
 Display GitHub contribution graphs right in your terminal. No token required.
 
 ## Install
