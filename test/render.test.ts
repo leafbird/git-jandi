@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { renderGraph } from "../src/render.js";
-import { THEMES } from "../src/colors.js";
+import { THEME } from "../src/colors.js";
 import type { ContributionData, StreakInfo } from "../src/types.js";
 
 function makeTestData(): ContributionData {
@@ -26,47 +26,47 @@ const streak: StreakInfo = { current: 5, max: 10 };
 
 describe("renderGraph", () => {
   it("총 contribution 수가 출력에 포함된다", () => {
-    const output = renderGraph(makeTestData(), streak, THEMES.dark, false);
+    const output = renderGraph(makeTestData(), streak, THEME, false);
     expect(output).toContain("42");
     expect(output).toContain("contributions in the last year");
   });
 
   it("streak 정보가 포함된다", () => {
-    const output = renderGraph(makeTestData(), streak, THEMES.dark, false);
+    const output = renderGraph(makeTestData(), streak, THEME, false);
     expect(output).toContain("Current streak: 5");
     expect(output).toContain("Max streak: 10");
   });
 
   it("hideStreak=true이면 streak이 출력되지 않는다", () => {
-    const output = renderGraph(makeTestData(), streak, THEMES.dark, true);
+    const output = renderGraph(makeTestData(), streak, THEME, true);
     expect(output).not.toContain("Current streak");
     expect(output).not.toContain("Max streak");
   });
 
   it("범례가 포함된다", () => {
-    const output = renderGraph(makeTestData(), streak, THEMES.dark, false);
+    const output = renderGraph(makeTestData(), streak, THEME, false);
     expect(output).toContain("Less");
     expect(output).toContain("More");
   });
 
   it("■ 블록 문자가 포함된다", () => {
-    const output = renderGraph(makeTestData(), streak, THEMES.dark, false);
+    const output = renderGraph(makeTestData(), streak, THEME, false);
     expect(output).toContain("■");
   });
 
   it("월 레이블이 포함된다", () => {
-    const output = renderGraph(makeTestData(), streak, THEMES.dark, false);
+    const output = renderGraph(makeTestData(), streak, THEME, false);
     expect(output).toContain("Jan");
   });
 
   it("ANSI 색상 코드가 포함된다", () => {
-    const output = renderGraph(makeTestData(), streak, THEMES.dark, false);
+    const output = renderGraph(makeTestData(), streak, THEME, false);
     // truecolor escape: \x1b[38;2;R;G;Bm
     expect(output).toMatch(/\x1b\[38;2;\d+;\d+;\d+m/);
   });
 
-  it("라이트 테마도 정상 렌더링된다", () => {
-    const output = renderGraph(makeTestData(), streak, THEMES.light, false);
+  it("단일 테마로 정상 렌더링된다", () => {
+    const output = renderGraph(makeTestData(), streak, THEME, false);
     expect(output).toContain("■");
     expect(output).toContain("42");
   });
