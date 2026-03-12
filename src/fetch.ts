@@ -13,7 +13,12 @@ export async function fetchContributions(
 
   let html: string;
   try {
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      headers: {
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
+      },
+    });
     if (res.status === 404) {
       throw new Error(`User "${username}" not found`);
     }

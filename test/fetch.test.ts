@@ -1,8 +1,8 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { readFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { parseHTML } from "../src/fetch.js";
+import { fetchContributions, parseHTML } from "../src/fetch.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const fixtureHTML = readFileSync(
@@ -63,5 +63,28 @@ describe("parseHTML", () => {
     expect(() => parseHTML("<html></html>")).toThrow(
       "Failed to parse contribution data"
     );
+  });
+});
+
+describe("fetchContributions", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("캐시 우회 헤더(Cache-Control, Pragma)를 포함해서 요청한다", async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: () => Promise.resolve(fixtureHTML),
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    await fetchContributions("leafbird");
+
+    expect(mockFetch).toHaveBeenCalledOnce();
+    const [, options] = mockFetch.mock.calls[0] as [string, RequestInit];
+    const headers = options?.headers as Record<string, string>;
+    expect(headers?.["Cache-Control"]).toBe("no-cache");
+    expect(headers?.["Pragma"]).toBe("no-cache");
   });
 });
