@@ -52,16 +52,30 @@ interface GraphQLResponse {
 }
 
 /**
- * 토큰을 확보하여 GraphQL API로 가져오거나, 실패 시 HTML 스크래핑으로 fallback.
- * 토큰 확보 순서: GITHUB_TOKEN 환경변수 → gh auth token 명령어
+ * 토큰을 확보하여 GraphQL API로 가져오거나, 실패 시 다음 단계로 fallback.
+ * 순서: GITHUB_TOKEN → gh auth token → HTML scraping
  */
 export async function fetchContributions(
   username: string
 ): Promise<ContributionData> {
-  const token = process.env.GITHUB_TOKEN ?? getGhAuthToken();
-  if (token) {
-    return fetchContributionsGraphQL(username, token);
+  const envToken = process.env.GITHUB_TOKEN;
+  if (envToken) {
+    try {
+      return await fetchContributionsGraphQL(username, envToken);
+    } catch {
+      // GITHUB_TOKEN 실패 → gh auth token으로 fallback
+    }
   }
+
+  const ghToken = getGhAuthToken();
+  if (ghToken) {
+    try {
+      return await fetchContributionsGraphQL(username, ghToken);
+    } catch {
+      // gh auth token 실패 → HTML로 fallback
+    }
+  }
+
   return fetchContributionsHTML(username);
 }
 

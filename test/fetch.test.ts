@@ -160,52 +160,58 @@ describe("fetchContributions (GraphQL)", () => {
     expect(data.weeks[0][5].level).toBe(4); // #216e39
   });
 
-  it("401 응답이면 토큰 에러를 던진다", async () => {
+  it("GITHUB_TOKEN 401 실패 시 gh auth token으로 fallback한다", async () => {
     process.env.GITHUB_TOKEN = "bad-token";
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({
-        ok: false,
-        status: 401,
-      })
-    );
-
-    await expect(fetchContributions("leafbird")).rejects.toThrow(
-      "Invalid GITHUB_TOKEN"
-    );
-  });
-
-  it("존재하지 않는 사용자이면 에러를 던진다", async () => {
-    process.env.GITHUB_TOKEN = "test-token";
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({
+    vi.mocked(child_process.execSync).mockReturnValue("ghp_good_token\n");
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce({ ok: false, status: 401 })  // env token 실패
+      .mockResolvedValueOnce({                              // gh token 성공
         ok: true,
         status: 200,
-        json: () => Promise.resolve({ data: { user: null } }),
-      })
-    );
+        json: () => Promise.resolve(fixtureGraphQL),
+      });
+    vi.stubGlobal("fetch", mockFetch);
 
-    await expect(fetchContributions("nobody")).rejects.toThrow("not found");
+    const data = await fetchContributions("leafbird");
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+    expect(data.source).toBe("graphql");
   });
 
-  it("GraphQL 에러 응답이면 에러를 던진다", async () => {
-    process.env.GITHUB_TOKEN = "test-token";
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({
+  it("GraphQL 모두 실패 시 HTML로 fallback한다", async () => {
+    process.env.GITHUB_TOKEN = "bad-token";
+    vi.mocked(child_process.execSync).mockReturnValue("ghp_also_bad\n");
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce({ ok: false, status: 401 })  // env token 실패
+      .mockResolvedValueOnce({ ok: false, status: 401 })  // gh token 실패
+      .mockResolvedValueOnce({                              // HTML fallback
         ok: true,
         status: 200,
-        json: () =>
-          Promise.resolve({
-            errors: [{ message: "Something went wrong" }],
-          }),
-      })
-    );
+        text: () => Promise.resolve(fixtureHTML),
+      });
+    vi.stubGlobal("fetch", mockFetch);
 
-    await expect(fetchContributions("leafbird")).rejects.toThrow(
-      "Something went wrong"
-    );
+    const data = await fetchContributions("leafbird");
+    expect(mockFetch).toHaveBeenCalledTimes(3);
+    expect(data.source).toBe("html");
+  });
+
+  it("gh CLI 없고 env token 실패 시 HTML로 fallback한다", async () => {
+    process.env.GITHUB_TOKEN = "bad-token";
+    vi.mocked(child_process.execSync).mockImplementation(() => {
+      throw new Error("command not found: gh");
+    });
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce({ ok: false, status: 401 })  // env token 실패
+      .mockResolvedValueOnce({                              // HTML fallback
+        ok: true,
+        status: 200,
+        text: () => Promise.resolve(fixtureHTML),
+      });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const data = await fetchContributions("leafbird");
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+    expect(data.source).toBe("html");
   });
 
   it("GITHUB_TOKEN 없어도 gh auth token으로 토큰을 확보하면 GraphQL을 사용한다", async () => {
