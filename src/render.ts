@@ -61,11 +61,13 @@ export function renderGraph(
     lines.push(line);
   }
 
-  // 범례
+  // 범례 + 데이터 소스
   const legendWidth = colCount * 2;
+  const sourceLabel = data.source === "graphql" ? "via GitHub API" : "via HTML scraping";
   const legendContent = buildLegend(theme);
-  const padding = Math.max(0, legendWidth - stripAnsi(legendContent).length);
-  lines.push(" ".repeat(padding) + legendContent);
+  const bottomRight = legendContent + "  " + sourceLabel;
+  const padding = Math.max(0, legendWidth - stripAnsi(bottomRight).length);
+  lines.push(" ".repeat(padding) + bottomRight);
 
   return lines.join("\n");
 }

@@ -1,0 +1,42 @@
+{
+  "data": {
+    "user": {
+      "contributionsCollection": {
+        "contributionCalendar": {
+          "totalContributions": 542,
+          "weeks": [
+            {
+              "contributionDays": [
+                { "contributionCount": 0, "date": "2024-03-17", "color": "#ebedf0" },
+                { "contributionCount": 2, "date": "2024-03-18", "color": "#9be9a8" },
+                { "contributionCount": 5, "date": "2024-03-19", "color": "#40c463" },
+                { "contributionCount": 0, "date": "2024-03-20", "color": "#ebedf0" },
+                { "contributionCount": 8, "date": "2024-03-21", "color": "#30a14e" },
+                { "contributionCount": 12, "date": "2024-03-22", "color": "#216e39" },
+                { "contributionCount": 1, "date": "2024-03-23", "color": "#9be9a8" }
+              ]
+            },
+            {
+              "contributionDays": [
+                { "contributionCount": 0, "date": "2024-03-24", "color": "#ebedf0" },
+                { "contributionCount": 0, "date": "2024-03-25", "color": "#ebedf0" },
+                { "contributionCount": 3, "date": "2024-03-26", "color": "#9be9a8" },
+                { "contributionCount": 7, "date": "2024-03-27", "color": "#40c463" },
+                { "contributionCount": 0, "date": "2024-03-28", "color": "#ebedf0" },
+                { "contributionCount": 1, "date": "2024-03-29", "color": "#9be9a8" },
+                { "contributionCount": 0, "date": "2024-03-30", "color": "#ebedf0" }
+              ]
+            },
+            {
+              "contributionDays": [
+                { "contributionCount": 4, "date": "2024-03-31", "color": "#40c463" },
+                { "contributionCount": 0, "date": "2024-04-01", "color": "#ebedf0" },
+                { "contributionCount": 0, "date": "2024-04-02", "color": "#ebedf0" }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}

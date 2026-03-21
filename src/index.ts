@@ -24,8 +24,14 @@ Options:
   --help, -h         Show this help
   --version, -v      Show version
 
+Data source (in priority order):
+  1. GITHUB_TOKEN env   GitHub GraphQL API (real-time)
+  2. gh auth token      GitHub GraphQL API via GitHub CLI
+  3. (fallback)         HTML scraping (may be cached by CDN)
+
 Examples:
   git-jandi leafbird
+  GITHUB_TOKEN=ghp_xxx git-jandi leafbird
   npx git-jandi octocat
 `.trim());
 }

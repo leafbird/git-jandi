@@ -1,12 +1,140 @@
+import { execSync } from "child_process";
 import type { ContributionData, DayData, WeekData } from "./types.js";
 
 const CONTRIBUTIONS_URL = "https://github.com/users/{username}/contributions";
+const GRAPHQL_URL = "https://api.github.com/graphql";
+
+const GRAPHQL_QUERY = `
+query($userName: String!) {
+  user(login: $userName) {
+    contributionsCollection {
+      contributionCalendar {
+        totalContributions
+        weeks {
+          contributionDays {
+            contributionCount
+            date
+            color
+          }
+        }
+      }
+    }
+  }
+}`;
+
+/** GitHub contribution 색상 → level(0-4) 매핑 */
+export const COLOR_TO_LEVEL: Record<string, number> = {
+  "#ebedf0": 0,
+  "#9be9a8": 1,
+  "#40c463": 2,
+  "#30a14e": 3,
+  "#216e39": 4,
+};
+
+interface GraphQLResponse {
+  data?: {
+    user?: {
+      contributionsCollection: {
+        contributionCalendar: {
+          totalContributions: number;
+          weeks: Array<{
+            contributionDays: Array<{
+              contributionCount: number;
+              date: string;
+              color: string;
+            }>;
+          }>;
+        };
+      };
+    };
+  };
+  errors?: Array<{ message: string }>;
+}
 
 /**
- * GitHub contributions 페이지를 가져와 파싱한다.
- * 토큰 불필요 — public HTML 스크래핑.
+ * 토큰을 확보하여 GraphQL API로 가져오거나, 실패 시 HTML 스크래핑으로 fallback.
+ * 토큰 확보 순서: GITHUB_TOKEN 환경변수 → gh auth token 명령어
  */
 export async function fetchContributions(
+  username: string
+): Promise<ContributionData> {
+  const token = process.env.GITHUB_TOKEN ?? getGhAuthToken();
+  if (token) {
+    return fetchContributionsGraphQL(username, token);
+  }
+  return fetchContributionsHTML(username);
+}
+
+/** gh CLI에서 인증 토큰을 가져온다. 실패 시 null 반환. */
+function getGhAuthToken(): string | null {
+  try {
+    return execSync("gh auth token", { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchContributionsGraphQL(
+  username: string,
+  token: string
+): Promise<ContributionData> {
+  let json: GraphQLResponse;
+  try {
+    const res = await fetch(GRAPHQL_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `bearer ${token}`,
+        "Content-Type": "application/json",
+        "User-Agent": "git-jandi",
+      },
+      body: JSON.stringify({
+        query: GRAPHQL_QUERY,
+        variables: { userName: username },
+      }),
+    });
+
+    if (res.status === 401) {
+      throw new Error(
+        "Invalid GITHUB_TOKEN. Check your token and try again."
+      );
+    }
+    if (!res.ok) {
+      throw new Error(`GitHub API error: HTTP ${res.status}`);
+    }
+
+    json = (await res.json()) as GraphQLResponse;
+  } catch (err) {
+    if (err instanceof Error && err.message.includes("GITHUB_TOKEN"))
+      throw err;
+    if (err instanceof Error && err.message.includes("GitHub API"))
+      throw err;
+    throw new Error(
+      "Failed to fetch contributions. Check your network connection."
+    );
+  }
+
+  if (json.errors?.length) {
+    throw new Error(`GitHub API error: ${json.errors[0].message}`);
+  }
+
+  if (!json.data?.user) {
+    throw new Error(`User "${username}" not found`);
+  }
+
+  const calendar =
+    json.data.user.contributionsCollection.contributionCalendar;
+
+  const weeks: WeekData[] = calendar.weeks.map((week) =>
+    week.contributionDays.map((day) => ({
+      date: day.date,
+      level: COLOR_TO_LEVEL[day.color] ?? 0,
+    }))
+  );
+
+  return { total: calendar.totalContributions, weeks, source: "graphql" };
+}
+
+async function fetchContributionsHTML(
   username: string
 ): Promise<ContributionData> {
   const url = CONTRIBUTIONS_URL.replace("{username}", username);
@@ -82,5 +210,5 @@ export function parseHTML(html: string): ContributionData {
     weeks.push(currentWeek);
   }
 
-  return { total, weeks };
+  return { total, weeks, source: "html" };
 }

@@ -19,7 +19,7 @@ function makeTestData(): ContributionData {
     }
     weeks.push(week);
   }
-  return { total: 42, weeks };
+  return { total: 42, weeks, source: "html" };
 }
 
 const streak: StreakInfo = { current: 5, max: 10 };
