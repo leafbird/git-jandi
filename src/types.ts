@@ -7,10 +7,14 @@ export interface DayData {
 /** 주 단위 (일~토, 최대 7일) */
 export type WeekData = DayData[];
 
+/** 데이터 소스 */
+export type DataSource = "graphql" | "html";
+
 /** fetch 결과 전체 */
 export interface ContributionData {
   total: number;       // 총 contribution 수
   weeks: WeekData[];   // 53주 분량
+  source: DataSource;  // 데이터 획득 방식
 }
 
 /** streak 계산 결과 */
