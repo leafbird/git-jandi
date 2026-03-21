@@ -9,7 +9,19 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/node/v/git-jandi)](https://nodejs.org)
 
-Display GitHub contribution graphs right in your terminal. No token required.
+Display GitHub contribution graphs right in your terminal.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/leafbird/git-jandi/main/docs/screenshot.png" alt="screenshot" width="800" />
+</p>
+
+## Quick Start
+
+```bash
+npx git-jandi <username>
+```
+
+That's it. No install, no token, no config.
 
 ## Install
 
@@ -17,44 +29,69 @@ Display GitHub contribution graphs right in your terminal. No token required.
 npm install -g git-jandi
 ```
 
-## Usage
-
-```bash
-# Run directly with npx (no install needed)
-npx git-jandi <username>
-
-# Or after global install
-git-jandi <username>
-```
-
 ### Options
 
 | Option | Description |
 |--------|-------------|
 | `--no-streak`, `-s` | Hide streak information |
-| `--light` | Use light theme colors |
 | `--help`, `-h` | Show help |
 | `--version`, `-v` | Show version |
 
-### Examples
-
-```bash
-git-jandi leafbird
-git-jandi torvalds --light
-git-jandi octocat --no-streak
-```
-
 ## Features
 
-- **Zero configuration** — no GitHub token needed
 - **Zero dependencies** — uses only Node.js built-ins
+- **Zero configuration** — works out of the box, no token needed
 - **Cross-platform** — works anywhere Node.js 18+ runs
 - **Streak tracking** — shows current and max contribution streaks
-- **Theme support** — dark (default) and light themes
 
-## How it works
+---
 
-Fetches the public GitHub contributions page (`github.com/users/{username}/contributions`) and parses the HTML to extract contribution data. No API token required since this is publicly available data.
+## How It Works
+
+By default, git-jandi scrapes the public GitHub contributions page. This works without any authentication, but the data may be delayed by up to a few hours due to GitHub's CDN cache.
+
+If a GitHub token is available, git-jandi automatically switches to the GitHub GraphQL API for real-time data. The output footer shows which method was used (`via GitHub API` or `via HTML scraping`).
+
+### Data Source Priority
+
+git-jandi tries the following methods in order, falling back to the next on failure:
+
+| Priority | Method | Condition | Real-time |
+|----------|--------|-----------|-----------|
+| 1 | GitHub GraphQL API | `GITHUB_TOKEN` env var is set | ✅ Yes |
+| 2 | GitHub GraphQL API | [GitHub CLI](https://cli.github.com/) is installed and authenticated | ✅ Yes |
+| 3 | HTML scraping | All above failed | ⚠️ Cached (up to a few hours delay) |
+
+### Setting Up a Token
+
+A token is entirely optional. If you want real-time data, choose one of the following:
+
+**Option 1: GitHub CLI (recommended)**
+
+If you already have [GitHub CLI](https://cli.github.com/) installed and authenticated, git-jandi detects it automatically. Nothing else to configure.
+
+```bash
+# Install GitHub CLI (macOS)
+brew install gh
+
+# Authenticate once
+gh auth login
+
+# git-jandi picks up the token automatically
+git-jandi <username>
+```
+
+**Option 2: Personal Access Token**
+
+Generate a [Personal Access Token](https://github.com/settings/tokens) and set it as an environment variable. Contribution data is public, so no extra scopes are required.
+
+```bash
+# One-time use
+GITHUB_TOKEN=ghp_xxxxxxxxxxxx git-jandi <username>
+
+# Or add to your shell profile (~/.zshrc, ~/.bashrc, etc.)
+export GITHUB_TOKEN=ghp_xxxxxxxxxxxx
+```
 
 ## Requirements
 
