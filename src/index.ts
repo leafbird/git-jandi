@@ -5,7 +5,7 @@ import { calculateStreak } from "./streak.js";
 import { THEME } from "./colors.js";
 import { renderGraph } from "./render.js";
 
-const VERSION = "0.0.1";
+const VERSION = "0.0.3";
 
 interface Options {
   username: string;
